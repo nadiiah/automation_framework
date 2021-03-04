@@ -50,3 +50,4 @@ hs_err_pid*
 
 # User-specific stuff
 .idea/
+/build/reports/tests/1614717346546.0.html

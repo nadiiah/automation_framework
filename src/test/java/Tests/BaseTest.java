@@ -1,24 +1,51 @@
 package Tests;
 
 import com.codeborne.selenide.WebDriverRunner;
+import com.skelia.nhryhor.pageobject.BasePage;
+import io.github.bonigarcia.wdm.WebDriverManager;
+import io.github.bonigarcia.wdm.config.DriverManagerType;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.*;
 import org.openqa.selenium.WebDriver;
 
 public class BaseTest {
 
-    private static WebDriver driver;
+    protected static WebDriver driver;
+    private static final Logger LOGGER = LoggerFactory.getLogger(BasePage.class);
 
     @BeforeClass(alwaysRun = true)
-    public WebDriver initDriver() {
-        System.setProperty("webdriver.chrome.driver", "src/main/resources/lib/chromeDriver/chromedriver");
+    public void initDriver() {
+        WebDriverManager.getInstance(DriverManagerType.CHROME).setup();
         driver = new ChromeDriver();
-        return driver;
+        WebDriverRunner.setWebDriver(driver);
+    }
+
+    @BeforeTest(alwaysRun = true)
+    public void beforeTest() {
+        LOGGER.info("Before Test");
+    }
+
+    @BeforeMethod(alwaysRun = true)
+    public void beforeMethod() {
+        LOGGER.info("Before Method");
     }
 
     @AfterClass(alwaysRun = true)
     public void terminateDriver() {
-        if (driver != null){
-        driver.quit();}
+        if (WebDriverRunner.hasWebDriverStarted()) {
+            WebDriverRunner.closeWebDriver();
+        }
+    }
+
+    @AfterTest(alwaysRun = true)
+    public void afterTest() {
+        LOGGER.info("After Test");
+    }
+
+    @AfterMethod(alwaysRun = true)
+    public void afterMethod() {
+        LOGGER.info("After Method");
     }
 }

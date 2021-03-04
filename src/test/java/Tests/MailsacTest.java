@@ -1,26 +1,44 @@
 package Tests;
 
 import com.codeborne.selenide.Selenide;
+import com.skelia.nhryhor.pageobject.LoginPage;
 import com.skelia.nhryhor.pageobject.MailsacPage;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.testng.Assert;
+import com.skelia.nhryhor.pageobject.PublicMailboxPage;
+import com.skelia.nhryhor.pageobject.UserMailboxPage;
+import com.skelia.nhryhor.providers.EmailProvider;
 import org.testng.annotations.Test;
 
 public class MailsacTest extends BaseTest {
 
-    MailsacPage page = new MailsacPage();
+    private MailsacPage homePage;
+    private LoginPage loginPage;
+    private UserMailboxPage userMailboxPage;
+    private PublicMailboxPage publicMailboxPage;
 
     @Test
     public void openMailsac() {
-        WebDriver driver = new ChromeDriver();
         Selenide.open("https://mailsac.com/");
-        Assert.assertTrue(page.isPageDisplayed());
+        homePage = Selenide.page(MailsacPage.class);
+        homePage.isPageDisplayed();
     }
 
-    @Test(dependsOnMethods = "openMailsac")
+    @Test(dependsOnMethods = "openMailsac", enabled = false)
     public void LogInMailsac() {
-        page.openMenu();
-        page.openLoginPage();
+        homePage.openMenu();
+        homePage.openLoginPage();
+        loginPage = Selenide.page(LoginPage.class);
+        loginPage.isPageDisplayed();
+        loginPage.enterCredentials("alpegaqa", "Transwide01");
+        loginPage.clickSignIn();
+        userMailboxPage = Selenide.page(UserMailboxPage.class);
+        userMailboxPage.isPageDisplayed();
+    }
+
+    @Test(dependsOnMethods = "openMailsac", dataProvider = "listOfEmails", dataProviderClass = EmailProvider.class)
+    public void openPublicMailboxes(String email) {
+        homePage.enterEmail(email);
+        publicMailboxPage = Selenide.page(PublicMailboxPage.class);
+        publicMailboxPage.isPageDisplayed();
+        publicMailboxPage.checkEmailBoxName(email);
     }
 }
